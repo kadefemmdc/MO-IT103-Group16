@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -230,6 +232,23 @@ public class EmployeeDashboardFrame extends JFrame {
         computePayrollButton.addActionListener(e -> computePayroll());
         resetButton.addActionListener(e -> resetForm());
 
+        employeeNumberField.getDocument().addDocumentListener(
+                new DocumentListener() {
+
+                    public void insertUpdate(DocumentEvent e) {
+                        clearOnEmployeeNumberChange();
+                    }
+
+                    public void removeUpdate(DocumentEvent e) {
+                        clearOnEmployeeNumberChange();
+                    }
+
+                    public void changedUpdate(DocumentEvent e) {
+                        clearOnEmployeeNumberChange();
+                    }
+                }
+        );
+
         setVisible(true);
     }
 
@@ -282,6 +301,7 @@ public class EmployeeDashboardFrame extends JFrame {
             hourlyRateValueLabel.setText(formatMoney(selectedEmployee.getHourlyRate()));
 
             clearPayrollLabels();
+            payPeriodComboBox.setSelectedIndex(0);
             payPeriodComboBox.setEnabled(true);
             computePayrollButton.setEnabled(true);
 
@@ -321,7 +341,10 @@ public class EmployeeDashboardFrame extends JFrame {
             return;
         }
 
+        // CP1 payroll rule:
+        // Deductions are applied only during the second payroll cutoff period.
         boolean applyDeductions = selectedPeriod.contains("16-");
+
         double monthlyGross = computeMonthlyGrossForSelectedPeriod(selectedPeriod);
 
         PayrollRecord payrollRecord = new PayrollRecord(
@@ -428,6 +451,23 @@ public class EmployeeDashboardFrame extends JFrame {
 
     private String formatMoney(double value) {
         return String.format("₱%,.2f", value);
+    }
+
+    private void clearOnEmployeeNumberChange() {
+
+        selectedEmployee = null;
+
+        nameValueLabel.setText("-");
+        birthdayValueLabel.setText("-");
+        positionValueLabel.setText("-");
+        hourlyRateValueLabel.setText("-");
+
+        clearPayrollLabels();
+
+        payPeriodComboBox.setSelectedIndex(0);
+        payPeriodComboBox.setEnabled(false);
+
+        computePayrollButton.setEnabled(false);
     }
 
     private void resetForm() {
