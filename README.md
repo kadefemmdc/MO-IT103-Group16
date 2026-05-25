@@ -19,15 +19,14 @@ Joy Mae Pedoy
 
 ## Program Details
 
-The MotorPH Employee App is a Java Swing-based payroll management system developed as part of Computer Programming 2 (CP2) Milestone 1. The project converts the previous console-based payroll application into a graphical user interface while maintaining the core payroll logic from CP1.
+The system is a payroll management application for MotorPH that uses CSV files as its primary data source for employee information and attendance records. The application provides an interactive graphical user interface that allows users to search employees, process attendance information, and compute payroll details.
 
-The system allows users to search employees using their employee number and displays employee details including employee name, birthday, position, and hourly rate.
+The system allows users to enter an employee number and retrieve employee information including employee name, birthday, position, and hourly rate. Once an employee is selected, the user can choose a payroll cutoff period and compute payroll information based on attendance records.
 
-The system reads employee information and attendance records from CSV files and computes payroll information based on MotorPH business rules. Attendance computation includes a work start time of 8:00 AM, a grace period until 8:10 AM, a one-hour lunch deduction, a work end limit of 5:00 PM, and a maximum daily work limit of 8 hours. Overtime is excluded in this milestone implementation.
+The application computes work hours using predefined company attendance rules. Working hours begin at 8:00 AM with a grace period until 8:10 AM. Login times beyond the grace period are treated as late entries. The system also applies a one-hour lunch deduction, limits work hours to a maximum of eight hours per day, and excludes overtime hours beyond the official work schedule.
 
-The application supports payroll cutoff selection from June to December and computes total hours worked for the selected payroll period. Gross pay is calculated using the employee hourly rate, and government deductions including SSS, PhilHealth, Pag-IBIG, and withholding tax are applied based on the combined monthly gross salary during the second cutoff period.
+The payroll computation process calculates the total hours worked for the selected cutoff period and determines the corresponding gross salary using the employee's hourly rate. Government deductions including SSS, PhilHealth, Pag-IBIG, and withholding tax are automatically calculated based on payroll rules and applied during payroll processing.
 
-The system uses validation and exception handling to prevent invalid user inputs and displays user-friendly messages to improve usability and interface interaction.
+The application includes input validation and exception handling to prevent invalid or missing user inputs. User-friendly feedback messages are displayed to guide users and improve overall usability and interaction with the system.
 
 ---
-
