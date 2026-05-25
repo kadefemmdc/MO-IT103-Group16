@@ -55,27 +55,36 @@ public class AttendanceRecord {
             LocalTime logout =
                     LocalTime.parse(logoutTime, formatter);
 
+            // MotorPH official work start time is 8:00 AM.
             LocalTime workStart =
                     LocalTime.of(8, 0);
 
+            // Employees who log in at 8:10 AM or earlier are still on time.
             LocalTime gracePeriod =
                     LocalTime.of(8, 10);
 
+            // Workday ends at 5:00 PM.
+            // Overtime after 5:00 PM is not included in this MS1 version.
             LocalTime workEnd =
                     LocalTime.of(17, 0);
 
+            // Logins earlier than 8:00 AM are treated as 8:00 AM.
             if (login.isBefore(workStart)) {
                 login = workStart;
             }
 
+            // 8:10 AM or earlier is treated as 8:00 AM.
+            // 8:11 AM onwards uses the actual login time, causing late deduction.
             if (!login.isAfter(gracePeriod)) {
                 login = workStart;
             }
 
+            // Logouts later than 5:00 PM are capped at 5:00 PM.
             if (logout.isAfter(workEnd)) {
                 logout = workEnd;
             }
 
+            // If logout is not later than login, no valid work hours are counted.
             if (!logout.isAfter(login)) {
                 return 0.0;
             }
@@ -83,6 +92,7 @@ public class AttendanceRecord {
             long minutesWorked =
                     Duration.between(login, logout).toMinutes();
 
+            // Deduct the standard 1-hour lunch break.
             if (minutesWorked <= 60) {
                 return 0.0;
             }
@@ -92,6 +102,7 @@ public class AttendanceRecord {
             double hours =
                     minutesWorked / 60.0;
 
+            // Maximum counted work hours per day is 8.
             if (hours > 8.0) {
                 hours = 8.0;
             }

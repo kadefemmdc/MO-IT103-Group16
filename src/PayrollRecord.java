@@ -15,7 +15,8 @@ public class PayrollRecord {
             Employee employee,
             String cutoffPeriod,
             double hoursWorked,
-            double monthlyGross
+            double monthlyGross,
+            boolean applyDeductions
     ) {
 
         this.employee = employee;
@@ -23,7 +24,22 @@ public class PayrollRecord {
 
         grossPay = computeGrossPay(hoursWorked);
 
-        computeNetPay(monthlyGross);
+        // CP1 logic:
+        // First cutoff (1–15) → no deductions
+        // Second cutoff (16–end) → deductions applied
+        if (applyDeductions) {
+
+            computeNetPay(monthlyGross);
+
+        } else {
+
+            sss = 0;
+            philHealth = 0;
+            pagibig = 0;
+            withholdingTax = 0;
+
+            netPay = grossPay;
+        }
     }
 
     public double computeGrossPay(double hoursWorked) {
@@ -37,6 +53,7 @@ public class PayrollRecord {
         DeductionCalculator calculator =
                 new DeductionCalculator();
 
+        // Deductions are based on full monthly gross
         sss =
                 calculator.computeSSS(monthlyGross);
 
@@ -55,7 +72,9 @@ public class PayrollRecord {
         }
 
         withholdingTax =
-                calculator.computeTax(taxableIncome);
+                calculator.computeTax(
+                        taxableIncome
+                );
 
         double totalDeductions =
                 sss

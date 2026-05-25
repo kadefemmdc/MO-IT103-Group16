@@ -321,13 +321,15 @@ public class EmployeeDashboardFrame extends JFrame {
             return;
         }
 
-        double grossPay = totalHours * selectedEmployee.getHourlyRate();
+        boolean applyDeductions = selectedPeriod.contains("16-");
+        double monthlyGross = computeMonthlyGrossForSelectedPeriod(selectedPeriod);
 
         PayrollRecord payrollRecord = new PayrollRecord(
                 selectedEmployee,
                 selectedPeriod,
                 totalHours,
-                grossPay
+                monthlyGross,
+                applyDeductions
         );
 
         cutoffPeriodValueLabel.setText(selectedPeriod);
@@ -345,6 +347,47 @@ public class EmployeeDashboardFrame extends JFrame {
                 "Computation Complete",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    private double computeMonthlyGrossForSelectedPeriod(String selectedPeriod) {
+
+        String monthName = selectedPeriod.split(" ")[0];
+        int targetMonth = getMonthNumber(monthName);
+
+        double monthlyHours = 0;
+
+        for (AttendanceRecord record : attendanceRecords) {
+            if (record.getEmployee().getEmployeeNumber()
+                    == selectedEmployee.getEmployeeNumber()) {
+
+                try {
+                    LocalDate date = parseDate(record.getDate());
+
+                    if (date.getMonthValue() == targetMonth) {
+                        monthlyHours += record.getHoursWorked();
+                    }
+
+                } catch (Exception e) {
+                    // Invalid date records are skipped.
+                }
+            }
+        }
+
+        return monthlyHours * selectedEmployee.getHourlyRate();
+    }
+
+    private int getMonthNumber(String monthName) {
+
+        switch (monthName) {
+            case "June": return 6;
+            case "July": return 7;
+            case "August": return 8;
+            case "September": return 9;
+            case "October": return 10;
+            case "November": return 11;
+            case "December": return 12;
+            default: return 0;
+        }
     }
 
     private boolean isWithinSelectedPeriod(String dateText, String selectedPeriod) {
