@@ -1,10 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class EmployeeDashboardFrame extends JFrame {
 
     private JTextField employeeNumberField;
+    private JComboBox<String> payPeriodComboBox;
 
     private JLabel nameValueLabel;
     private JLabel birthdayValueLabel;
@@ -37,7 +40,7 @@ public class EmployeeDashboardFrame extends JFrame {
         attendanceRecords = dataManager.loadAttendanceRecords();
 
         setTitle("MotorPH Employee App");
-        setSize(650, 760);
+        setSize(670, 820);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -58,7 +61,7 @@ public class EmployeeDashboardFrame extends JFrame {
         gbc.gridy = 1;
 
         JLabel instruction = new JLabel(
-                "Search an employee, review details, then compute payroll from attendance records.",
+                "Search an employee, select a payroll cutoff period, then compute payroll.",
                 SwingConstants.CENTER
         );
         instruction.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -76,6 +79,32 @@ public class EmployeeDashboardFrame extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
+        panel.add(new JLabel("Pay Period:"), gbc);
+
+        gbc.gridx = 1;
+        payPeriodComboBox = new JComboBox<>(new String[]{
+                "June 1-15",
+                "June 16-30",
+                "July 1-15",
+                "July 16-31",
+                "August 1-15",
+                "August 16-31",
+                "September 1-15",
+                "September 16-30",
+                "October 1-15",
+                "October 16-31",
+                "November 1-15",
+                "November 16-30",
+                "December 1-15",
+                "December 16-31"
+        });
+        payPeriodComboBox.setEnabled(false);
+        panel.add(payPeriodComboBox, gbc);
+
+        payPeriodComboBox.addActionListener(e -> clearPayrollLabels());
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
         searchButton = new JButton("Search Employee");
         panel.add(searchButton, gbc);
 
@@ -83,10 +112,10 @@ public class EmployeeDashboardFrame extends JFrame {
         resetButton = new JButton("Reset Form");
         panel.add(resetButton, gbc);
 
-        addSectionHeader(panel, gbc, "Employee Details", 4);
+        addSectionHeader(panel, gbc, "Employee Details", 5);
 
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         panel.add(new JLabel("Employee Name:"), gbc);
 
         gbc.gridx = 1;
@@ -94,7 +123,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(nameValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         panel.add(new JLabel("Birthday:"), gbc);
 
         gbc.gridx = 1;
@@ -102,7 +131,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(birthdayValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 8;
         panel.add(new JLabel("Position:"), gbc);
 
         gbc.gridx = 1;
@@ -110,7 +139,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(positionValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         panel.add(new JLabel("Hourly Rate:"), gbc);
 
         gbc.gridx = 1;
@@ -118,7 +147,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(hourlyRateValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         gbc.gridwidth = 2;
 
         computePayrollButton = new JButton("Compute Payroll");
@@ -127,10 +156,10 @@ public class EmployeeDashboardFrame extends JFrame {
 
         gbc.gridwidth = 1;
 
-        addSectionHeader(panel, gbc, "Attendance Summary", 10);
+        addSectionHeader(panel, gbc, "Attendance Summary", 11);
 
         gbc.gridx = 0;
-        gbc.gridy = 11;
+        gbc.gridy = 12;
         panel.add(new JLabel("Cutoff Period:"), gbc);
 
         gbc.gridx = 1;
@@ -138,17 +167,17 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(cutoffPeriodValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 12;
-        panel.add(new JLabel("Hours Worked (Sample Cutoff):"), gbc);
+        gbc.gridy = 13;
+        panel.add(new JLabel("Hours Worked:"), gbc);
 
         gbc.gridx = 1;
         hoursWorkedValueLabel = new JLabel("-");
         panel.add(hoursWorkedValueLabel, gbc);
 
-        addSectionHeader(panel, gbc, "Salary Computation", 13);
+        addSectionHeader(panel, gbc, "Salary Computation", 14);
 
         gbc.gridx = 0;
-        gbc.gridy = 14;
+        gbc.gridy = 15;
         panel.add(new JLabel("Gross Pay:"), gbc);
 
         gbc.gridx = 1;
@@ -156,7 +185,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(grossPayValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 15;
+        gbc.gridy = 16;
         panel.add(new JLabel("SSS:"), gbc);
 
         gbc.gridx = 1;
@@ -164,7 +193,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(sssValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 16;
+        gbc.gridy = 17;
         panel.add(new JLabel("PhilHealth:"), gbc);
 
         gbc.gridx = 1;
@@ -172,7 +201,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(philHealthValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 17;
+        gbc.gridy = 18;
         panel.add(new JLabel("Pag-IBIG:"), gbc);
 
         gbc.gridx = 1;
@@ -180,7 +209,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(pagibigValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 18;
+        gbc.gridy = 19;
         panel.add(new JLabel("Withholding Tax:"), gbc);
 
         gbc.gridx = 1;
@@ -188,7 +217,7 @@ public class EmployeeDashboardFrame extends JFrame {
         panel.add(taxValueLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 19;
+        gbc.gridy = 20;
         panel.add(new JLabel("Net Pay:"), gbc);
 
         gbc.gridx = 1;
@@ -204,129 +233,69 @@ public class EmployeeDashboardFrame extends JFrame {
         setVisible(true);
     }
 
-    private void addSectionHeader(
-        JPanel panel,
-        GridBagConstraints gbc,
-        String text,
-        int row
-) {
+    private void addSectionHeader(JPanel panel, GridBagConstraints gbc, String text, int row) {
 
-    gbc.gridx = 0;
-    gbc.gridy = row;
-    gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridwidth = 2;
 
-    JPanel headerPanel =
-            new JPanel(
-                    new FlowLayout(
-                            FlowLayout.CENTER
-                    )
-            );
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        headerPanel.setOpaque(false);
 
-    headerPanel.setOpaque(false);
+        JLabel sectionLabel = new JLabel(text);
+        sectionLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
-    JLabel sectionLabel =
-            new JLabel(text);
+        headerPanel.add(sectionLabel);
+        panel.add(headerPanel, gbc);
 
-    sectionLabel.setFont(
-            new Font(
-                    "Arial",
-                    Font.BOLD,
-                    16
-            )
-    );
-
-    headerPanel.add(sectionLabel);
-
-    panel.add(headerPanel, gbc);
-
-    gbc.gridwidth = 1;
-}
-
-private void searchEmployee() {
-
-    try {
-
-        String employeeNumberText =
-                employeeNumberField.getText().trim();
-
-        // Empty field validation
-        if (employeeNumberText.isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Please enter an employee number."
-            );
-        }
-
-        // Allow only numbers and optional minus sign
-        if (!employeeNumberText.matches("-?[0-9]+")) {
-
-            throw new IllegalArgumentException(
-                    "Employee Number must be numeric."
-            );
-        }
-
-        int employeeNumber =
-                Integer.parseInt(employeeNumberText);
-
-        // Negative number validation
-        if (employeeNumber <= 0) {
-
-            throw new IllegalArgumentException(
-                    "Employee Number must be greater than zero."
-            );
-        }
-
-        selectedEmployee =
-                dataManager.findEmployeeByNumber(
-                        employees,
-                        employeeNumber
-                );
-
-        if (selectedEmployee == null) {
-
-            throw new IllegalArgumentException(
-                    "Employee not found."
-            );
-        }
-
-        nameValueLabel.setText(
-                selectedEmployee.getFullName()
-        );
-
-        birthdayValueLabel.setText(
-                selectedEmployee.getBirthday()
-        );
-
-        positionValueLabel.setText(
-                selectedEmployee.getPosition()
-        );
-
-        hourlyRateValueLabel.setText(
-                formatMoney(
-                        selectedEmployee.getHourlyRate()
-                )
-        );
-
-        clearPayrollLabels();
-
-        computePayrollButton.setEnabled(true);
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Employee record loaded successfully.",
-                "Search Successful",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
+        gbc.gridwidth = 1;
     }
 
-    catch (IllegalArgumentException ex) {
+    private void searchEmployee() {
 
-        showErrorMessage(
-                ex.getMessage()
-        );
+        try {
+            String employeeNumberText = employeeNumberField.getText().trim();
+
+            if (employeeNumberText.isEmpty()) {
+                throw new IllegalArgumentException("Please enter an employee number.");
+            }
+
+            if (!employeeNumberText.matches("-?[0-9]+")) {
+                throw new IllegalArgumentException("Employee Number must be numeric.");
+            }
+
+            int employeeNumber = Integer.parseInt(employeeNumberText);
+
+            if (employeeNumber <= 0) {
+                throw new IllegalArgumentException("Employee Number must be greater than zero.");
+            }
+
+            selectedEmployee = dataManager.findEmployeeByNumber(employees, employeeNumber);
+
+            if (selectedEmployee == null) {
+                throw new IllegalArgumentException("Employee not found.");
+            }
+
+            nameValueLabel.setText(selectedEmployee.getFullName());
+            birthdayValueLabel.setText(selectedEmployee.getBirthday());
+            positionValueLabel.setText(selectedEmployee.getPosition());
+            hourlyRateValueLabel.setText(formatMoney(selectedEmployee.getHourlyRate()));
+
+            clearPayrollLabels();
+            payPeriodComboBox.setEnabled(true);
+            computePayrollButton.setEnabled(true);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Employee record loaded successfully.",
+                    "Search Successful",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (IllegalArgumentException ex) {
+            showErrorMessage(ex.getMessage());
+        }
     }
-}
 
     private void computePayroll() {
 
@@ -335,43 +304,33 @@ private void searchEmployee() {
             return;
         }
 
+        String selectedPeriod = payPeriodComboBox.getSelectedItem().toString();
+
         double totalHours = 0;
-        int count = 0;
 
         for (AttendanceRecord record : attendanceRecords) {
-            if (record.getEmployee().getEmployeeNumber()
-                    == selectedEmployee.getEmployeeNumber()) {
+            if (record.getEmployee().getEmployeeNumber() == selectedEmployee.getEmployeeNumber()
+                    && isWithinSelectedPeriod(record.getDate(), selectedPeriod)) {
 
                 totalHours += record.getHoursWorked();
-                count++;
-
-                if (count == 10) {
-                    break;
-                }
             }
         }
 
         if (totalHours <= 0) {
-            showErrorMessage(
-                    "No attendance records found for this employee."
-            );
+            showErrorMessage("No attendance records found for this employee in the selected pay period.");
             return;
         }
 
-        String cutoffPeriod =
-                "Sample Cutoff - First 10 Attendance Records";
-
-        double monthlyGross =
-                totalHours * selectedEmployee.getHourlyRate();
+        double grossPay = totalHours * selectedEmployee.getHourlyRate();
 
         PayrollRecord payrollRecord = new PayrollRecord(
                 selectedEmployee,
-                cutoffPeriod,
+                selectedPeriod,
                 totalHours,
-                monthlyGross
+                grossPay
         );
 
-        cutoffPeriodValueLabel.setText(cutoffPeriod);
+        cutoffPeriodValueLabel.setText(selectedPeriod);
         hoursWorkedValueLabel.setText(String.format("%.2f", totalHours));
         grossPayValueLabel.setText(formatMoney(payrollRecord.getGrossPay()));
         sssValueLabel.setText(formatMoney(payrollRecord.getSSS()));
@@ -382,10 +341,46 @@ private void searchEmployee() {
 
         JOptionPane.showMessageDialog(
                 this,
-                "Payroll computed successfully.",
+                "Payroll computed successfully for " + selectedPeriod + ".",
                 "Computation Complete",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    private boolean isWithinSelectedPeriod(String dateText, String selectedPeriod) {
+
+        try {
+            LocalDate date = parseDate(dateText);
+
+            int month = date.getMonthValue();
+            int day = date.getDayOfMonth();
+
+            if (selectedPeriod.equals("June 1-15")) return month == 6 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("June 16-30")) return month == 6 && day >= 16 && day <= 30;
+            if (selectedPeriod.equals("July 1-15")) return month == 7 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("July 16-31")) return month == 7 && day >= 16 && day <= 31;
+            if (selectedPeriod.equals("August 1-15")) return month == 8 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("August 16-31")) return month == 8 && day >= 16 && day <= 31;
+            if (selectedPeriod.equals("September 1-15")) return month == 9 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("September 16-30")) return month == 9 && day >= 16 && day <= 30;
+            if (selectedPeriod.equals("October 1-15")) return month == 10 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("October 16-31")) return month == 10 && day >= 16 && day <= 31;
+            if (selectedPeriod.equals("November 1-15")) return month == 11 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("November 16-30")) return month == 11 && day >= 16 && day <= 30;
+            if (selectedPeriod.equals("December 1-15")) return month == 12 && day >= 1 && day <= 15;
+            if (selectedPeriod.equals("December 16-31")) return month == 12 && day >= 16 && day <= 31;
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    private LocalDate parseDate(String dateText) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+        return LocalDate.parse(dateText, formatter);
     }
 
     private String formatMoney(double value) {
@@ -393,7 +388,10 @@ private void searchEmployee() {
     }
 
     private void resetForm() {
+
         employeeNumberField.setText("");
+        payPeriodComboBox.setSelectedIndex(0);
+        payPeriodComboBox.setEnabled(false);
         selectedEmployee = null;
 
         nameValueLabel.setText("-");
@@ -406,6 +404,7 @@ private void searchEmployee() {
     }
 
     private void clearPayrollLabels() {
+
         cutoffPeriodValueLabel.setText("-");
         hoursWorkedValueLabel.setText("-");
         grossPayValueLabel.setText("-");
@@ -417,6 +416,7 @@ private void searchEmployee() {
     }
 
     private void showErrorMessage(String message) {
+
         JOptionPane.showMessageDialog(
                 this,
                 message,

@@ -3,13 +3,19 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class AttendanceRecord {
+
     private Employee employee;
     private String date;
     private String loginTime;
     private String logoutTime;
     private double hoursWorked;
 
-    public AttendanceRecord(Employee employee, String date, String loginTime, String logoutTime) {
+    public AttendanceRecord(
+            Employee employee,
+            String date,
+            String loginTime,
+            String logoutTime
+    ) {
         this.employee = employee;
         this.date = date;
         this.loginTime = loginTime;
@@ -25,38 +31,57 @@ public class AttendanceRecord {
         return date;
     }
 
+    public String getLoginTime() {
+        return loginTime;
+    }
+
+    public String getLogoutTime() {
+        return logoutTime;
+    }
+
     public double getHoursWorked() {
         return hoursWorked;
     }
 
     public double computeHoursWorked() {
+
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("H:mm");
 
-            LocalTime login = LocalTime.parse(loginTime, formatter);
-            LocalTime logout = LocalTime.parse(logoutTime, formatter);
+            LocalTime login =
+                    LocalTime.parse(loginTime, formatter);
 
-            LocalTime start = LocalTime.of(8, 0);
-            LocalTime grace = LocalTime.of(8, 10);
-            LocalTime end = LocalTime.of(17, 0);
+            LocalTime logout =
+                    LocalTime.parse(logoutTime, formatter);
 
-            if (login.isBefore(start)) {
-                login = start;
+            LocalTime workStart =
+                    LocalTime.of(8, 0);
+
+            LocalTime gracePeriod =
+                    LocalTime.of(8, 10);
+
+            LocalTime workEnd =
+                    LocalTime.of(17, 0);
+
+            if (login.isBefore(workStart)) {
+                login = workStart;
             }
 
-            if (logout.isAfter(end)) {
-                logout = end;
+            if (!login.isAfter(gracePeriod)) {
+                login = workStart;
             }
 
-            if (!login.isAfter(grace)) {
-                login = start;
+            if (logout.isAfter(workEnd)) {
+                logout = workEnd;
             }
 
             if (!logout.isAfter(login)) {
                 return 0.0;
             }
 
-            long minutesWorked = Duration.between(login, logout).toMinutes();
+            long minutesWorked =
+                    Duration.between(login, logout).toMinutes();
 
             if (minutesWorked <= 60) {
                 return 0.0;
@@ -64,7 +89,8 @@ public class AttendanceRecord {
 
             minutesWorked -= 60;
 
-            double hours = minutesWorked / 60.0;
+            double hours =
+                    minutesWorked / 60.0;
 
             if (hours > 8.0) {
                 hours = 8.0;
